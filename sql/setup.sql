@@ -23,10 +23,10 @@ CREATE TABLE restaurants (
 
 CREATE TABLE reviews (
   id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  user_id BIGINT,
-  restaurant_id BIGINT,
-  stars INT,
-  detail VARCHAR,
+  user_id BIGINT NOT NULL,
+  restaurant_id BIGINT NOT NULL,
+  stars INT NOT NULL,
+  detail VARCHAR NOT NULL,
   FOREIGN KEY (user_id) REFERENCES users(id),
   FOREIGN KEY (restaurant_id) REFERENCES restaurants(id)
 );
