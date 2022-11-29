@@ -67,9 +67,8 @@ describe('user routes', () => {
   });
 
   it('GET /protected should return the current user if authenticated', async () => {
-    const agent = await registerAndLogin();
-    const res = await agent
-      .get('/api/v1/users/protected');
+    const [agent] = await registerAndLogin({ ...mockUser });
+    const res = await agent.get('/api/v1/users/protected');
     expect(res.status).toEqual(200);
   });
 
@@ -83,10 +82,10 @@ describe('user routes', () => {
   });
 
   it('/users should return a 200 if user is admin', async () => {
-    const agent = await registerAndLogin({ email: 'admin', password: '1234' });
+    const [agent] = await registerAndLogin({ email: 'admin', password: '1234' });
     const res = await agent
-      .getById('/api/v1/users');
-    expect(res.statusCode).toEqual(200);
+      .get('/api/v1/users');
+    expect(res.status).toEqual(200);
   });
 
   it('DELETE /sessions deletes the user session', async () => {
