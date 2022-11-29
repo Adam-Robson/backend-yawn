@@ -72,13 +72,13 @@ describe('user routes', () => {
     expect(res.status).toEqual(200);
   });
 
-  it('GET /users should return 403 if user not admin', async () => {
+  it('GET /users should return 401 if user not admin', async () => {
     const agent = request.agent(app);
     await UserService.create({ ...mockUser });
     await agent.post('/api/v1/users/sessions').send({ email: 'Test', password: '12345' });
     const res = await agent
       .get('/api/v1/users');
-    expect(res.statusCode).toEqual(403);
+    expect(res.statusCode).toEqual(401);
   });
 
   it('/users should return a 200 if user is admin', async () => {
