@@ -1,6 +1,6 @@
 -- Use this file to define your SQL tables
 -- The SQL in this file will be executed when you run `npm run setup-db`
-DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS users CASCADE;
 DROP TABLE IF EXISTS restaurants CASCADE;
 DROP TABLE IF EXISTS reviews CASCADE;
 
@@ -89,5 +89,5 @@ INSERT INTO
   reviews (user_id, restaurant_id, stars, detail)
 VALUES
   (1, 1, 5, 'Best restaurant ever!'),
-  (2, 1, 1, 'Terrible service :(')),
+  (2, 1, 1, 'Terrible service.'),
   (3, 1, 4, 'It was fine.');
