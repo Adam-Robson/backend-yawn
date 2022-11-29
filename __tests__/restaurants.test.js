@@ -2,6 +2,25 @@ const pool = require('../lib/utils/pool');
 const setup = require('../data/setup');
 const request = require('supertest');
 const app = require('../lib/app');
+const authenticate = require('../lib/middleware/authenticate');
+const UserService = require('../lib/services/UserService');
+
+const testUser = {
+  firstName: 'Test User',
+  lastName: 'Testing User',
+  email: 'user@testing.com',
+  password: '123456789',
+};
+
+const registerAndLogin = async () => {
+  const agent = request.agent(app);
+  const user = await UserService.create(testUser);
+  await agent
+    .post('/api/v1/users/sessions')
+    .send({ email: testUser.email, password: testUser.password });
+  return [agent, user];
+};
+
 
 describe('restaurants routes', () => {
   beforeEach(() => {
@@ -11,7 +30,7 @@ describe('restaurants routes', () => {
     pool.end();
   });
 
-  it('GET api/v1/restaurants should return a list of restaurants', async () => {
+  test('GET api/v1/restaurants should return a list of restaurants', async () => {
     const res = await request(app).get('/api/v1/restaurants');
     expect(res.status).toBe(200);
     expect(res.body).toMatchInlineSnapshot(`
@@ -52,10 +71,10 @@ describe('restaurants routes', () => {
     `);
   });
 
-  it('GET api/v1/restaurants/:id should return a restaurant with reviews', async () => {
-    const resp = await request(app).get('/api/v1/restaurants/1');
-    expect(resp.status).toBe(200);
-    expect(resp.body).toMatchInlineSnapshot(`
+  test('GET api/v1/restaurants/:id should return a restaurant with reviews', async () => {
+    const res = await request(app).get('/api/v1/restaurants/1');
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchInlineSnapshot(`
       Object {
         "cost": 1,
         "cuisine": "American",
@@ -88,5 +107,17 @@ describe('restaurants routes', () => {
         "website": "http://www.PipsOriginal.com",
       }
     `);
+  });
+
+  test('POST /api/v1/restaurants/:id/reviews should create a new review when logged in', authenticate, async () => {
+    const [agent] = await registerAndLogin();
+    const review = {
+      restaurantId: 1,
+      stars: 5,
+      detail: 'This is urgent. I have something to say. Call the fire brigade.'
+    };
+    const res = await agent.post('/api/v1/restaurants/1/reviews').send(review);
+    expect(res.status).toBe(201);
+    expect(res.body).toMatchInlineSnapshot();
   });
 });
