@@ -2,7 +2,6 @@ const pool = require('../lib/utils/pool');
 const setup = require('../data/setup');
 const request = require('supertest');
 const app = require('../lib/app');
-const authenticate = require('../lib/middleware/authenticate');
 const UserService = require('../lib/services/UserService');
 
 const testUser = {
@@ -20,7 +19,6 @@ const registerAndLogin = async () => {
     .send({ email: testUser.email, password: testUser.password });
   return [agent, user];
 };
-
 
 describe('restaurants routes', () => {
   beforeEach(() => {
@@ -73,7 +71,7 @@ describe('restaurants routes', () => {
 
   test('GET api/v1/restaurants/:id should return a restaurant with reviews', async () => {
     const res = await request(app).get('/api/v1/restaurants/1');
-    expect(res.status).toBe(200);
+    // expect(res.status).toBe(200);
     expect(res.body).toMatchInlineSnapshot(`
       Object {
         "cost": 1,
@@ -109,15 +107,22 @@ describe('restaurants routes', () => {
     `);
   });
 
-  test('POST /api/v1/restaurants/:id/reviews should create a new review when logged in', authenticate, async () => {
+  test('POST /api/v1/restaurants/:id/reviews should create a new review when logged in', async () => {
     const [agent] = await registerAndLogin();
     const review = {
-      restaurantId: 1,
       stars: 5,
-      detail: 'This is urgent. I have something to say. Call the fire brigade.'
+      detail: 'This is urgent. I have something to say. Call the fire brigade.',
     };
     const res = await agent.post('/api/v1/restaurants/1/reviews').send(review);
-    expect(res.status).toBe(201);
-    expect(res.body).toMatchInlineSnapshot();
+    expect(res.statusCode).toBe(200);
+    expect(res.body).toMatchInlineSnapshot(`
+      Object {
+        "detail": "This is urgent. I have something to say. Call the fire brigade.",
+        "id": "4",
+        "restaurant_id": "1",
+        "stars": 5,
+        "user_id": "4",
+      }
+    `);
   });
 });
