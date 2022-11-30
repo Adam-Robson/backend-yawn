@@ -133,7 +133,7 @@ describe('restaurants routes', () => {
       .delete('/api/v1/reviews/1')
       .send({ message: 'Thank god this review was deleted!' });
     expect(res.status).toBe(200);
-    const deleteCheck = await agent.get('/api/v1/reviews/1');
-    expect(deleteCheck.status).toBe(404);
+    const remove = await agent.get('/api/v1/reviews/1');
+    expect(remove.status).toBe(404);
   });
 });
