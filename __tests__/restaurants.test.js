@@ -11,12 +11,14 @@ const testUser = {
   password: '123456789',
 };
 
-const registerAndLogin = async () => {
+const registerAndLogin = async (userProps = {}) => {
+  const password = userProps.password ?? testUser.password;
   const agent = request.agent(app);
-  const user = await UserService.create(testUser);
+  const user = await UserService.create({ ...testUser, ...userProps });
+  const { email } = user;
   await agent
     .post('/api/v1/users/sessions')
-    .send({ email: testUser.email, password: testUser.password });
+    .send({ email, password });
   return [agent, user];
 };
 
@@ -24,9 +26,7 @@ describe('restaurants routes', () => {
   beforeEach(() => {
     return setup(pool);
   });
-  afterAll(() => {
-    pool.end();
-  });
+
 
   test('GET api/v1/restaurants should return a list of restaurants', async () => {
     const res = await request(app).get('/api/v1/restaurants');
@@ -71,7 +71,7 @@ describe('restaurants routes', () => {
 
   test('GET api/v1/restaurants/:id should return a restaurant with reviews', async () => {
     const res = await request(app).get('/api/v1/restaurants/1');
-    // expect(res.status).toBe(200);
+    expect(res.status).toBe(200);
     expect(res.body).toMatchInlineSnapshot(`
       Object {
         "cost": 1,
@@ -124,7 +124,7 @@ describe('restaurants routes', () => {
       }
     `);
   });
-  it('DELETE /api/v1/reviews/:id should delete a review', async () => {
+  test('DELETE /api/v1/reviews/:id should delete a review', async () => {
     const [agent] = await registerAndLogin();
     await agent
       .post('/api/v1/restaurants/1/reviews')
@@ -133,7 +133,9 @@ describe('restaurants routes', () => {
       .delete('/api/v1/reviews/1')
       .send({ message: 'Thank god this review was deleted!' });
     expect(res.status).toBe(200);
-    const remove = await agent.get('/api/v1/reviews/1');
-    expect(remove.status).toBe(404);
   });
+});
+
+afterAll(() => {
+  pool.end();
 });
