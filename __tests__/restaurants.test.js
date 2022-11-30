@@ -109,11 +109,10 @@ describe('restaurants routes', () => {
 
   test('POST /api/v1/restaurants/:id/reviews should create a new review when logged in', async () => {
     const [agent] = await registerAndLogin();
-    const review = {
+    const res = await agent.post('/api/v1/restaurants/1/reviews').send({
       stars: 5,
       detail: 'This is urgent. I have something to say. Call the fire brigade.',
-    };
-    const res = await agent.post('/api/v1/restaurants/1/reviews').send(review);
+    });
     expect(res.statusCode).toBe(200);
     expect(res.body).toMatchInlineSnapshot(`
       Object {
@@ -124,5 +123,17 @@ describe('restaurants routes', () => {
         "user_id": "4",
       }
     `);
+  });
+  it('DELETE /api/v1/reviews/:id should delete a review', async () => {
+    const [agent] = await registerAndLogin();
+    await agent
+      .post('/api/v1/restaurants/1/reviews')
+      .send({ detail: 'another new review, a hot take, opinion soup and influence', stars: 2 });
+    const res = await agent
+      .delete('/api/v1/reviews/1')
+      .send({ message: 'Thank god this review was deleted!' });
+    expect(res.status).toBe(200);
+    const deleteCheck = await agent.get('/api/v1/reviews/1');
+    expect(deleteCheck.status).toBe(404);
   });
 });
