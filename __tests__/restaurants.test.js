@@ -40,8 +40,8 @@ describe('restaurants routes', () => {
   test('POST /api/v1/restaurants/:id/reviews should create a new review when logged in', async () => {
     const [agent] = await registerAndLogin();
     const res = await agent.post('/api/v1/restaurants/1/reviews').send({
-      stars: 5,
-      detail: 'This is urgent. I have something to say. Call the fire brigade.',
+      'stars': 5,
+      'detail': 'This is urgent. I have something to say. Call the fire brigade.',
     });
     expect(res.status).toBe(200);
     expect(res.body).toMatchInlineSnapshot(`
