@@ -28,7 +28,7 @@ describe('github auth', () => {
       iat: expect.any(Number),
       id: expect.any(String),
       login: 'github_user',
-      message: "relation \"github_users\" does not exist",
+      message: 'relation \'github_users\' does not exist',
       status: 500
     });
   });
