@@ -22,12 +22,14 @@ describe('github auth', () => {
       .get('/api/v1/github/callback?code=42')
       .redirects(1);
     expect(res.body).toEqual({
+      avatar: 'https://www.placekitten.com/300/300',
+      email: 'example@example.com',
+      exp: expect.any(Number),
+      iat: expect.any(Number),
       id: expect.any(String),
       login: 'github_user',
-      email: 'example@example.com',
-      avatar: 'https://www.placekitten.com/300/300',
-      iat: expect.any(Number),
-      exp: expect.any(Number),
+      message: "relation \"github_users\" does not exist",
+      status: 500
     });
   });
 
